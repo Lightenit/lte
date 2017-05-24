@@ -64,6 +64,24 @@ def initial(Docu_NUM,Topic_NUM,Embedding_SIZE,POS_NUM,dictionary,docs):
             m[doc_count,temp_k] = m[doc_count,temp_k] + 1
             for word in sen:
                 n[word[0],temp_k] = n[word[0],temp_k] + 1
+                i_word[word[0]] = np.random.binomial(1,tao[word[1]])
+        Topic_List.append(topic_doc)
+# Initial topic vector
+    Topic_Vec = np.random.random((Topic_NUM, Embedding_SIZE))
+# Initial word vector
+    Word_Vec = np.zeros(len(dictionary))
+    model = gensim.models.Word2Vec.load_word2vec_format('.bin',binary = Ture)
+    for word,index in dictionary:
+        try:
+            Word_Vec[index] = model.wv[word]
+        except:
+            Word_Vec[index] = np.random.random(Embedding_SIZE)
+    return m,n,tao,Topic_List, Topic_Vec, Word_Vec,i_word
+
+def Update(m,n,tao, Topic_List,Topic_Vec,Word_Vec,i_word,docs):
+    
+
+
                 
 
 
