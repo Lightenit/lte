@@ -8,7 +8,7 @@ import numpy as np
 import random
 import nltk
 import gensim
-
+import math
 
 def preprocess(doc):
     doc_sen = sent_tokenize(doc)
@@ -19,12 +19,56 @@ def preprocess(doc):
         predoc.append(sen_word)
     return doc
 
-def build_dict(docs):
+def build_dict(docs_word):
+    word_set = set(docs_word)
     dictionary = dict()
-    for doc in docs:
-        for sen in doc:
-            for word in sen:
-                dictionary[word] = len(dictionary)
+    for word in word_set:
+        dictionary[word] = len(dictionary)
     reversed_dictionary = dict(zip(dictionary.vaules(), dictionary.keys()))
+    return dictionary, reversed_dictionary
+
+def doc_tran(docs,dictionary,reversed_dictionary):
+    POS_dictionary = dict()
+    for POS in ['ADJ','ADV','CNJ','DET','EX','FW','MOD','N','NP','NUM','PRO','P','TO','UH','V','VD','VG','VN','WH']:
+        POS_dictionary[POS] = len(POS_dictionary)
+    POS_NUM = len(POS_dictionary)
+    Tran_Docs = []
+    for doc in docs:
+        tran_doc = []
+        for sen in doc:
+            tran_sen = []
+            tag_sen = nltk.pos_tag(sen)
+            for word,pos in tag_sen:
+                tran_sen.append((dictionary[word],POS_dictionary[pos]))
+            tran_doc.append(tran_sen)
+        Tran_Docs.append(tran_doc)
+    return Tran_Docs, POS_NUM
+
+
+
+def initial(Docu_NUM,Topic_NUM,Embedding_SIZE,POS_NUM,dictionary,docs):
+# Topic INIT for all sent in all doc
+    Topic_List = []
+    m = np.zeros((Docu_NUM,Topic_NUM))
+    n = np.zeros((len(dictionary),Topic_NUM))
+    doc_count = 0
+    tao = np.random.random(POS_NUM)
+    tao[7] = 0.9
+    i_word = np.zeros(len(dictionary))
+    for doc in docs:
+        topic_doc = []
+        for sen in doc:
+            ran = random.random()
+            temp_k = math.floor(temp_k*Topic_NUM)
+            topic_doc.append(temp_k)
+            m[doc_count,temp_k] = m[doc_count,temp_k] + 1
+            for word in sen:
+                n[word[0],temp_k] = n[word[0],temp_k] + 1
+                
+
+
+
+
+
     
 
