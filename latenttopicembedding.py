@@ -89,9 +89,26 @@ def Update(m,n,tao, Topic_List,Topic_Vec,Word_Vec,i_word,docs):
             for  k in Topic_NUM:
                 temp_prod = 1
                 for word,pos in docs[d][s]:
-                    temp_prod = temp_prod * ((1-tao[pos]) * (n[word,s_topic] + beta)/(sum(n[:,s_topic])+len(dictionary)*beta) + tao[pos] * np.exp((Word_Vec[word]+Topic_Vec[s_topic]).dot(Topic_Vec[s_topic])))
+                    temp_prod = temp_prod * ((1-tao[pos]) * (n[word,s_topic] + beta)/(sum(n[:,s_topic])+len(dictionary)*beta) + tao[pos] * np.exp((Word_Vec[word]+Topic_Vec[s_topic]).dot(Word_Vec[word])))
                 P_z[k] = temp_prod * (m[s_topic,d] + alpha)
             P_z = P_z/np.linalg.norm(P_z)
+            s_topic = np.random.multinomial(1,P_z)
+            s_topic = list(s_topic).index(1)
+            for word,pos in docs[d][s]:
+                P_i_1 = tao[pos] * np.exp((Word_Vec[word]+Topic_Vec[s_topic]).dot(Word_Vec[word]))
+                P_i_0 = (1-tao[pos]) * (n[word,s_topic] + beta)/(sum(n[:,s_topic]) + len(dictionary) * beta)
+                P_i = P_i_1/(P_i_1 + P_i_0)
+                i_word[word] = np.random.binomial(1,P_i)
+            m[s_topic,d] = m[s_topic,d] + 1
+            for word,_ in docs[d][s]:
+                n[word,s_topic] = n[word,s_topic] +1
+    return m,n,tao,Topic_List, Topic_Vec, Word_Vec,i_word
+
+def Embedding_Update(m,n,tao,Topic_List, Word_Vec, i_word, docs):
+    for d in range(len(docs)):
+        for s in range(len(docs[d])):
+
+
 
 
 
