@@ -79,6 +79,22 @@ def initial(Docu_NUM,Topic_NUM,Embedding_SIZE,POS_NUM,dictionary,docs):
     return m,n,tao,Topic_List, Topic_Vec, Word_Vec,i_word
 
 def Update(m,n,tao, Topic_List,Topic_Vec,Word_Vec,i_word,docs):
+    for d in range(len(docs)):
+        for s in range(len(docs[d])):
+            s_topic = Topic_List[d][s]
+            m[s_topic,d] = m[s_topic,d] - 1
+            for word,_ in docs[d][s]:
+                n[word,s_topic] = n[word,s_topic] - 1
+            P_z = np.zeros(Topic_NUM)
+            for  k in Topic_NUM:
+                temp_prod = 1
+                for word,pos in docs[d][s]:
+                    temp_prod = temp_prod * ((1-tao[pos]) * (n[word,s_topic] + beta)/(sum(n[:,s_topic])+len(dictionary)*beta) + tao[pos] * np.exp((Word_Vec[word]+Topic_Vec[s_topic]).dot(Topic_Vec[s_topic])))
+                P_z[k] = temp_prod * (m[s_topic,d] + alpha)
+            P_z = P_z/np.linalg.norm(P_z)
+
+
+
     
 
 
