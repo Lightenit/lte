@@ -104,9 +104,57 @@ def Update(m,n,tao, Topic_List,Topic_Vec,Word_Vec,i_word,docs):
                 n[word,s_topic] = n[word,s_topic] +1
     return m,n,tao,Topic_List, Topic_Vec, Word_Vec,i_word
 
-def Embedding_Update(m,n,tao,Topic_List, Word_Vec, i_word, docs):
+def sigmoid(x):
+    return 1/1 + np.exp(-x)
+
+def Embedding_Update(m,n,tao,Topic_List,Topic_Vec, Word_Vec, i_word, docs, eta,neg):
     for d in range(len(docs)):
         for s in range(len(docs[d])):
+            for word_index in range(len(docs[d][s])):
+                if i_word[docs[d][s][word_index[0]]]==1:
+                    if word_index != 0 and word_index != len(docs[d][s])-1:
+                        C_w = []
+                        C_w.append(docs[d][s][word_index-1][0])
+                        C_w.append(docs[d][s][word_index+1][0])
+                    if word_index ==0:
+                        C_w = []
+                        C_w.append(docs[d][s][word_index+1][0])
+                    if word_index == len(docs[d][s]-1):
+                        C_w = []
+                        C_w.append(docs[d][s][word_index-1][0])
+                    neg_sample = np.random.random(neg)*len(i_word)
+                    neg_sample = np.floor(neg_sample)
+                    for negs in neg_sample:
+                        x_w = Word_Vec[docs[d][s][word_index][0]] + Topic_Vec[Topic_List[d][s]] 
+                        Topic_Vec[Topic_List[d][s]] = Topic_Vec[Topic_List[d][s]] + eta * (0.01-sigmoid(x_w.dot(Word_Vec[negs])-np.log(neg/len(i_word)))) * Word_Vec[negs]
+                    for cw in C_w:
+                        x_w = Word_Vec[docs[d][s][word_index][0]] + Topic_Vec[Topic_List[d][s]] 
+                        Topic_Vec[Topic_List[d][s]] = Topic_Vec[Topic_List[d][s]] + eta * (0.99-sigmoid(x_w.dot(Word_Vec[cw])-np.log(neg/len(i_word)))) * Word_Vec[cw]
+    return m,n,tao,Topic_List, Topic_Vec,Word_Vec,i_word,docs
+
+def Update_tao(m,n,tao,Topic_List,i_word,docs,POS_NUM,POS_dictionary):
+    sum_tao = np.zeros(POS_NUM)
+    sum_tao_i = np.zeros(POS_NUM)
+    for i in range(len(docs)):
+        for sen in docs[i]:
+            for word,pos in sen:
+                sum_tao[POS_dictionary[pos]] = sum_tao[POS_dictionary[pos]] + 1
+                if i_word[word] == 1:
+                    sum_tao_i[POS_dictionary[pos]] = sum_tao_i[POS_dictionary[pos]] + 1
+    tao = np.zeros(POS_NUM)
+    for i in range(POS_NUM):
+        tao[i] = sum_tao_i/sum_tao
+    return tao
+
+
+
+        
+
+    
+                        
+                        
+
+
 
 
 
