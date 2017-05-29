@@ -146,6 +146,7 @@ def Update_tao(m,n,tao,Topic_List,i_word,docs,POS_NUM,POS_dictionary):
         tao[i] = sum_tao_i/sum_tao
     return tao
 
+if __name__ == "__main__":
 
 
         
